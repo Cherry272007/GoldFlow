@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: goldflow-web
+    env: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt && cd frontend && npm install && npm run build
+    startCommand: gunicorn backend.app:app
+    envVars:
+      - key: GOLDFLOW_API_KEY
+        generateValue: true
+      - key: GOLDFLOW_DB
+        value: /tmp/goldflow.db
