@@ -100,6 +100,13 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
 
       <SignalCard analysis={analysis} />
 
+      <div className="mt-3"><PriceCard market={market} /></div>
+      <div className="mt-3"><SourcesCard market={market} /></div>
+
+      <div className="mt-3">
+        <MarketConditions indicators={indicators} />
+      </div>
+
       <div className="mt-3">
         <section className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
           <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted">AI Gold Analyze</div>
@@ -132,13 +139,6 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
             <div className="mt-3"><AIAnalysis analysis={goldAnalysis} loading={goldBusy} /></div>
           ) : null}
         </section>
-      </div>
-
-      <div className="mt-3"><PriceCard market={market} /></div>
-      <div className="mt-3"><SourcesCard market={market} /></div>
-
-      <div className="mt-3">
-        <MarketConditions indicators={indicators} />
       </div>
 
       <footer className="sticky bottom-0 z-10 mt-4 bg-gradient-to-b from-transparent via-bg/95 to-bg pb-3">
