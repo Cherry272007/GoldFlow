@@ -99,7 +99,12 @@ export default function AIPage({ market, status, onNavigate }) {
           {goldError ? (
             <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{goldError}</div>
           ) : null}
-          <div className="mt-3"><AIAnalysis analysis={goldAnalysis} loading={goldBusy} /></div>
+          <div className="mt-3">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gold">
+              Analyse current market · Result
+            </div>
+            <AIAnalysis analysis={goldAnalysis} loading={goldBusy} />
+          </div>
         </Card>
 
         <Card title="AI Image Analyze" sub="charts">
@@ -117,8 +122,11 @@ export default function AIPage({ market, status, onNavigate }) {
             <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{imageError}</div>
           ) : null}
           <div className="mt-3">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gold">
+              AI image analyze · Result
+            </div>
             <ScreenshotAnalysis images={images} analysis={imageAnalysis} />
-            <AIAnalysis analysis={imageAnalysis} loading={imageBusy} />
+            <div className="mt-3"><AIAnalysis analysis={imageAnalysis} loading={imageBusy} /></div>
           </div>
         </Card>
       </div>

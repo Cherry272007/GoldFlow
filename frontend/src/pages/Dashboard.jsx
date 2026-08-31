@@ -98,12 +98,7 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
     <div className="mx-auto w-full max-w-6xl px-4 pb-44 lg:px-8">
       <Header market={market} status={status} variant="dashboard" onNavigate={onNavigate} />
 
-      <PriceCard market={market} />
-      <div className="mt-3"><SourcesCard market={market} /></div>
-
-      <div className="mt-3">
-        <SignalCard analysis={analysis} />
-      </div>
+      <SignalCard analysis={analysis} />
 
       <div className="mt-3">
         <section className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
@@ -138,6 +133,9 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
           ) : null}
         </section>
       </div>
+
+      <div className="mt-3"><PriceCard market={market} /></div>
+      <div className="mt-3"><SourcesCard market={market} /></div>
 
       <div className="mt-3">
         <MarketConditions indicators={indicators} />
