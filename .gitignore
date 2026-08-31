@@ -23,6 +23,8 @@ bookmap/dist/
 
 # Compiled EA contains the live API key - never commit it
 mt5/GoldFlowEA.ex5
+# The local EA source is keyed for this customer - keep it out of git
+mt5/GoldFlowEA.mq5
 
 # macOS
 .DS_Store
