@@ -209,6 +209,8 @@ class AnalysisService:
         market, indicators = self.snapshot()
         result = SignalEngine().evaluate(indicators)
         result["price"] = indicators.get("price") or market.get("price")
+        result["provider"] = "signal-engine"
+        result["model"] = "technical"
         status = market.get("status")
         result["market_status"] = status
         if status != "LIVE":

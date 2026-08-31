@@ -16,35 +16,26 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
   const goldRunningRef = useRef(false)
   const [market, setMarket] = useState(null)
   const [indicators, setIndicators] = useState(null)
-  const [analysis, setAnalysis] = useState(null)
+  const [technical, setTechnical] = useState(null)
   const [status, setStatus] = useState(liveStatus || null)
   const socketRef = useRef(null)
 
   const applySnapshot = useCallback((snap) => {
     if (snap.market) setMarket(snap.market)
     if (snap.indicators) setIndicators(snap.indicators)
-    if (snap.signal) {
-      setAnalysis((prev) => {
-        if (!prev) return snap.signal
-        const newTs = snap.signal.ts || snap.signal.generated_at
-        const prevTs = prev.ts || prev.generated_at
-        if (!newTs || !prevTs) return snap.signal
-        return newTs !== prevTs ? snap.signal : prev
-      })
-    }
   }, [])
 
   const loadInit = useCallback(async () => {
     try {
-      const [m, ind, sig, st] = await Promise.all([
+      const [m, ind, cmp, st] = await Promise.all([
         api.fetchMarket(),
         api.fetchIndicators(),
-        api.fetchSignal(),
+        api.fetchCompare(),
         api.fetchStatus(),
       ])
       setMarket(m)
       setIndicators(ind)
-      setAnalysis(sig)
+      if (cmp && cmp.technical) setTechnical(cmp.technical)
       setStatus(st)
     } catch (e) {}
   }, [])
@@ -58,20 +49,26 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
         if (cancelled) { sock.close(); return }
         socketRef.current = sock
         sock.on('market_update', (d) => applySnapshot(d))
-        sock.on('analysis_update', (d) => { if (d.analysis) setAnalysis(d.analysis) })
+        sock.on('analysis_update', async () => {
+          try {
+            const cmp = await api.fetchCompare()
+            if (cmp && cmp.technical) setTechnical(cmp.technical)
+          } catch {}
+        })
         sock.emit('refresh')
       })
       .catch(() => {})
 
     const poll = setInterval(async () => {
       try {
-        const sig = await api.fetchSignal()
-        setAnalysis((prev) => {
-          if (!prev) return sig
-          const newTs = sig.ts || sig.generated_at
+        const cmp = await api.fetchCompare()
+        if (cmp && cmp.technical) setTechnical((prev) => {
+          const t = cmp.technical
+          if (!prev) return t
+          const newTs = t.ts || t.generated_at
           const prevTs = prev.ts || prev.generated_at
-          if (!newTs || !prevTs) return sig
-          return newTs !== prevTs ? sig : prev
+          if (!newTs || !prevTs) return t
+          return newTs !== prevTs ? t : prev
         })
       } catch {}
     }, 8000)
@@ -98,7 +95,7 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
     <div className="mx-auto w-full max-w-6xl px-4 pb-44 lg:px-8">
       <Header market={market} status={status} variant="dashboard" onNavigate={onNavigate} />
 
-      <SignalCard analysis={analysis} />
+      <SignalCard analysis={technical} />
 
       <div className="mt-3"><PriceCard market={market} /></div>
       <div className="mt-3"><SourcesCard market={market} /></div>
