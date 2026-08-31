@@ -3,7 +3,7 @@ import { fmtAge } from '../services/format'
 import NotificationToggle from './NotificationToggle'
 
 function Lane({ label, connected, sub, tone }) {
-  const color = tone || (connected ? '#21d07a' : '#ff4d5e')
+  const color = tone || (connected ? '#10b981' : '#c0392b')
   return (
     <div className="flex items-center justify-between border-b border-line/50 py-2.5 last:border-0">
       <div>
@@ -45,13 +45,13 @@ export default function ConnectionStatus({ status = null }) {
       <Lane
         label="Market Data"
         connected={market.connected}
-        tone={market.status === 'RESTRICTED' ? '#ffb224' : undefined}
+        tone={market.status === 'RESTRICTED' ? '#d4a017' : undefined}
         sub={market.source?.name}
       />
       <Lane
         label="AI Engine"
         connected={aiConnected}
-        tone={aiConnected ? undefined : ai.configured ? '#ffb224' : '#ff4d5e'}
+        tone={aiConnected ? undefined : ai.configured ? '#d4a017' : '#c0392b'}
         sub={`${ai.provider || 'OpenRouter'}${ai.model ? ' · ' + ai.model : ''}`}
       />
       <Lane

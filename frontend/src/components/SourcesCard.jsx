@@ -12,9 +12,9 @@ const style = (status) => {
   }
 }
 const dot = (status) => {
-  if (status === 'LIVE') return '#21d07a'
-  if (status === 'STALE') return '#ffb224'
-  return '#ff4d5e'
+  if (status === 'LIVE') return '#10b981'
+  if (status === 'STALE') return '#d4a017'
+  return '#c0392b'
 }
 
 function Source({ s, active }) {

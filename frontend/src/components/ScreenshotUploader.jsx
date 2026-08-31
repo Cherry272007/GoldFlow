@@ -46,7 +46,7 @@ export default function ScreenshotUploader({ onAdd, disabled = false }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 4 V16 M6 22 H18 M12 16 L7 10 M12 16 L17 10 M4 12 H2 M22 12 H20"
-              stroke="#f5c542"
+              stroke="#c9a45c"
               strokeWidth="2"
               strokeLinecap="round"
             />

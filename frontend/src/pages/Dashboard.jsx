@@ -158,12 +158,11 @@ export default function Dashboard() {
       <TabBar active={activeTab} onChange={setActiveTab} />
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        {/* ── Left column: price + signal + connection ── */}
+        {/* ── Left column: price + feeds + signal ── */}
         <div className="space-y-3 lg:col-span-2">
           <PriceCard market={market} />
           <SourcesCard market={market} />
           <SignalCard analysis={analysis} loading={analyzing} />
-          <ConnectionStatus status={status} />
 
           {/* On mobile: show only the active tab's section below the main cards */}
           <div className="lg:hidden">
@@ -174,43 +173,43 @@ export default function Dashboard() {
               <AIAnalysis analysis={analysis} loading={analyzing} />
             )}
             {activeTab === 'image' && (
-              <div className="space-y-3">
-                <div className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
-                  <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <rect x="3" y="3" width="18" height="18" rx="3" stroke="#f5c542" strokeWidth="1.5" />
-                      <circle cx="8.5" cy="8.5" r="1.5" fill="#f5c542" />
-                      <path d="M3 16 L8 12 L13 16 L17 13 L21 16" stroke="#f5c542" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    Image Analyze
-                  </div>
-                  <ScreenshotUploader onAdd={addImages} disabled={analyzing} />
-                  <ScreenshotPreview images={images} onRemove={removeImage} />
-
-                  <button
-                    onClick={handleAnalyze}
-                    disabled={analyzing}
-                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-yellow-500 py-3.5 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg shadow-gold/20 ring-1 ring-gold/40 transition hover:shadow-gold/40 active:scale-[0.99] disabled:opacity-50 disabled:shadow-none"
-                  >
-                    {analyzing ? (
-                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
-                        <path d="M12 2 a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="2" />
-                        <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      </svg>
-                    )}
-                    {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Upload & Analyse'}
-                  </button>
-
-                  {analyzeError ? (
-                    <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{analyzeError}</div>
-                  ) : null}
+              <div className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
+                <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="#c9a45c" strokeWidth="1.5" />
+                    <circle cx="8.5" cy="8.5" r="1.5" fill="#c9a45c" />
+                    <path d="M3 16 L8 12 L13 16 L17 13 L21 16" stroke="#c9a45c" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  Image Analyze
                 </div>
+
                 <ScreenshotAnalysis images={images} analysis={analysis} />
+
+                <ScreenshotUploader onAdd={addImages} disabled={analyzing} />
+                <ScreenshotPreview images={images} onRemove={removeImage} />
+
+                <button
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-yellow-500 py-3.5 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg shadow-gold/20 ring-1 ring-gold/40 transition hover:shadow-gold/40 active:scale-[0.99] disabled:opacity-50 disabled:shadow-none"
+                >
+                  {analyzing ? (
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+                      <path d="M12 2 a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="2" />
+                      <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  )}
+                  {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Upload & Analyse'}
+                </button>
+
+                {analyzeError ? (
+                  <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{analyzeError}</div>
+                ) : null}
               </div>
             )}
           </div>
@@ -228,12 +227,15 @@ export default function Dashboard() {
           <div className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="3" width="18" height="18" rx="3" stroke="#f5c542" strokeWidth="1.5" />
-                <circle cx="8.5" cy="8.5" r="1.5" fill="#f5c542" />
-                <path d="M3 16 L8 12 L13 16 L17 13 L21 16" stroke="#f5c542" strokeWidth="1.5" strokeLinecap="round" />
+                <rect x="3" y="3" width="18" height="18" rx="3" stroke="#c9a45c" strokeWidth="1.5" />
+                <circle cx="8.5" cy="8.5" r="1.5" fill="#c9a45c" />
+                <path d="M3 16 L8 12 L13 16 L17 13 L21 16" stroke="#c9a45c" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              Image Analyze
+              AI Image Analysis
             </div>
+
+            <ScreenshotAnalysis images={images} analysis={analysis} />
+
             <ScreenshotUploader onAdd={addImages} disabled={analyzing} />
             <ScreenshotPreview images={images} onRemove={removeImage} />
 
@@ -260,7 +262,6 @@ export default function Dashboard() {
               <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{analyzeError}</div>
             ) : null}
           </div>
-          <ScreenshotAnalysis images={images} analysis={analysis} />
         </div>
       </div>
 
@@ -273,6 +274,8 @@ export default function Dashboard() {
           {historyExpanded ? 'Show less' : 'Show all history'}
         </button>
       ) : null}
+
+      <ConnectionStatus status={status} />
 
       <footer className="pt-4 text-center text-[10px] text-muted/70">
         GoldFlow — alert-only gold analysis. Not financial advice. Market data via London Strategic Edge.

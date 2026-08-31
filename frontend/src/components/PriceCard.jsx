@@ -13,7 +13,7 @@ export default function PriceCard({ market }) {
       <div className="relative flex items-start justify-between">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Gold Spot</div>
-          <div className="mt-1 text-4xl font-extrabold tabular-nums tracking-tight text-gold drop-shadow-[0_0_18px_rgba(245,197,66,0.25)]">
+          <div className="mt-1 text-4xl font-extrabold tabular-nums tracking-tight text-gold-light drop-shadow-[0_0_18px_rgba(232,213,163,0.22)]">
             {fmtPrice(mid)}
           </div>
         </div>

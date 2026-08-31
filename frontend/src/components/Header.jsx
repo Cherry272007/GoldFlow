@@ -13,9 +13,9 @@ const statusStyle = (status) => {
 }
 
 const dot = (status) => {
-  if (status === 'LIVE') return '#21d07a'
-  if (status === 'STALE') return '#ffb224'
-  return '#ff4d5e'
+  if (status === 'LIVE') return '#10b981'
+  if (status === 'STALE') return '#d4a017'
+  return '#c0392b'
 }
 
 export default function Header({ market, status }) {
@@ -27,10 +27,10 @@ export default function Header({ market, status }) {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"
-              stroke="#f5c542"
+              stroke="#c9a45c"
               strokeWidth="1.8"
             />
-            <text x="12" y="15" textAnchor="middle" fontSize="8" fontWeight="700" fill="#f5c542">
+            <text x="12" y="15" textAnchor="middle" fontSize="8" fontWeight="700" fill="#c9a45c">
               G
             </text>
           </svg>

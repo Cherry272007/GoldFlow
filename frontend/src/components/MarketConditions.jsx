@@ -34,8 +34,8 @@ export default function MarketConditions({ indicators = null }) {
       <div className="mb-3 flex items-center justify-between">
         <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9" stroke="#f5c542" strokeWidth="1.5" />
-            <text x="12" y="16" textAnchor="middle" fontSize="10" fontWeight="700" fill="#f5c542">Au</text>
+            <circle cx="12" cy="12" r="9" stroke="#c9a45c" strokeWidth="1.5" />
+            <text x="12" y="16" textAnchor="middle" fontSize="10" fontWeight="700" fill="#c9a45c">Au</text>
           </svg>
           Gold Analysis
         </span>

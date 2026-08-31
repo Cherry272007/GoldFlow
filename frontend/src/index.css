@@ -1,27 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0b111c;
-  --color-card: #141c2c;
-  --color-card2: #1a2436;
-  --color-line: #223046;
-  --color-fg: #e8eef5;
-  --color-muted: #8ca0b3;
-  --color-ok: #21d07a;
-  --color-bad: #ff4d5e;
-  --color-wait: #ffb224;
-  --color-gold: #f5c542;
+  /* Dark Gold Premium — deep charcoal with subtle metallic gold accents */
+  --color-bg: #0c0c0d;
+  --color-card: #141415;
+  --color-card2: #1b1b1d;
+  --color-line: #2b2b2e;
+  --color-fg: #ededf0;
+  --color-muted: #a6a6b0;
+  --color-ok: #10b981;   /* emerald green — BUY */
+  --color-bad: #c0392b;  /* deep red — SELL */
+  --color-wait: #d4a017; /* amber gold — WAIT */
+  --color-gold: #c9a45c;       /* metallic gold accent */
+  --color-gold-light: #e8d5a3; /* soft champagne gold highlight */
 }
 
 html {
   background: var(--color-bg);
 }
 
-/* Subtle ambient gold glow for depth */
+/* Subtle ambient champagne-gold glow for depth */
 body {
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(245, 197, 66, 0.06), transparent 60%),
-    radial-gradient(900px 500px at -10% 10%, rgba(33, 208, 122, 0.04), transparent 60%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(201, 164, 92, 0.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(201, 164, 92, 0.04), transparent 60%),
     var(--color-bg);
   color: var(--color-fg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
@@ -31,7 +33,7 @@ body {
 }
 
 ::selection {
-  background: rgba(245, 197, 66, 0.3);
+  background: rgba(201, 164, 92, 0.3);
 }
 
 /* thin scrollbars on dark cards */

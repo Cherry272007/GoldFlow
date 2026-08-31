@@ -132,8 +132,8 @@ PAGE = r"""
 <meta name="theme-color" content="#0b111c">
 <title>GoldFlow</title>
 <style>
- :root{--bg:#0b111c;--card:#141c2c;--line:#223046;--fg:#e8eef5;--muted:#8ca0b3;
-       --ok:#21d07a;--bad:#ff4d5e;--wait:#ffb224}
+ :root{--bg:#0c0c0d;--card:#141415;--line:#2b2b2e;--fg:#ededf0;--muted:#a6a6b0;
+       --ok:#10b981;--bad:#c0392b;--wait:#d4a017}
  *{box-sizing:border-box}
  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:var(--bg);color:var(--fg)}

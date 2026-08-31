@@ -2,9 +2,9 @@ import React from 'react'
 import { fmtTime } from '../services/format'
 
 const COLORS = {
-  BUY: { text: 'text-ok', border: 'border-ok/40', bg: 'bg-ok/10', bar: '#21d07a', glyph: '▲' },
-  SELL: { text: 'text-bad', border: 'border-bad/40', bg: 'bg-bad/10', bar: '#ff4d5e', glyph: '▼' },
-  WAIT: { text: 'text-wait', border: 'border-wait/40', bg: 'bg-wait/10', bar: '#ffb224', glyph: '◆' },
+  BUY: { text: 'text-ok', border: 'border-ok/40', bg: 'bg-ok/10', bar: '#10b981', glyph: '▲' },
+  SELL: { text: 'text-bad', border: 'border-bad/40', bg: 'bg-bad/10', bar: '#c0392b', glyph: '▼' },
+  WAIT: { text: 'text-wait', border: 'border-wait/40', bg: 'bg-wait/10', bar: '#d4a017', glyph: '◆' },
 }
 
 export default function SignalCard({ analysis = null, loading = false }) {
