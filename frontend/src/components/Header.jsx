@@ -55,6 +55,7 @@ export default function Header({ market, status, variant = 'dashboard', onNaviga
         <nav className="flex items-center rounded-xl border border-line/70 bg-card p-1">
           {tab('dashboard', 'Dashboard')}
           {tab('ai', 'AI')}
+          {tab('history', 'History')}
         </nav>
         <div
           className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${statusStyle(s)}`}

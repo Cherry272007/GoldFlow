@@ -27,7 +27,7 @@ export default function ScreenshotUploader({ onAdd, disabled = false }) {
   return (
     <div>
       <div
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed px-4 py-7 text-center transition-all ${
+        className={`flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed px-4 py-3 text-center transition-all ${
           drag ? 'scale-[0.99] border-gold/80 bg-gold/10' : 'border-line bg-gradient-to-b from-card to-card2'
         }`}
         onClick={() => inputRef.current?.click()}
@@ -42,8 +42,8 @@ export default function ScreenshotUploader({ onAdd, disabled = false }) {
           handleFiles(e.dataTransfer.files)
         }}
       >
-        <div className={`grid h-11 w-11 place-items-center rounded-full border transition-colors ${drag ? 'border-gold/60 bg-gold/15' : 'border-gold/40 bg-gold/10'}`}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <div className={`grid h-8 w-8 place-items-center rounded-full border transition-colors ${drag ? 'border-gold/60 bg-gold/15' : 'border-gold/40 bg-gold/10'}`}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 4 V16 M6 22 H18 M12 16 L7 10 M12 16 L17 10 M4 12 H2 M22 12 H20"
               stroke="#c9a45c"
@@ -52,9 +52,9 @@ export default function ScreenshotUploader({ onAdd, disabled = false }) {
             />
           </svg>
         </div>
-        <div className="text-sm font-semibold">Upload chart screenshots</div>
-        <div className="text-[11px] leading-relaxed text-muted">
-          Tap, or drag & drop a photo of your chart to give the AI extra context
+        <div className="text-xs font-semibold">Upload chart screenshots</div>
+        <div className="text-[10px] leading-snug text-muted">
+          Tap or drag & drop a chart photo for context
         </div>
       </div>
       <input

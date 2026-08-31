@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Dashboard from './pages/Dashboard'
 import AIPage from './pages/AIPage'
+import HistoryPage from './pages/HistoryPage'
 import * as api from './services/api'
 
 export default function App() {
@@ -26,5 +27,7 @@ export default function App() {
   const nav = (id) => setPage(id)
   const common = { market, status, onNavigate: nav }
 
-  return page === 'ai' ? <AIPage {...common} /> : <Dashboard {...common} />
+  if (page === 'ai') return <AIPage {...common} />
+  if (page === 'history') return <HistoryPage {...common} />
+  return <Dashboard {...common} />
 }

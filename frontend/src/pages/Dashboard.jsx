@@ -2,10 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import PriceCard from '../components/PriceCard'
 import SignalCard from '../components/SignalCard'
-import SignalCompare from '../components/SignalCompare'
 import SourcesCard from '../components/SourcesCard'
 import MarketConditions from '../components/MarketConditions'
-import SignalHistory from '../components/SignalHistory'
 import AIAnalysis from '../components/AIAnalysis'
 import AISignalResult from '../components/AISignalResult'
 import ConnectionStatus from '../components/ConnectionStatus'
@@ -19,10 +17,7 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
   const [market, setMarket] = useState(null)
   const [indicators, setIndicators] = useState(null)
   const [analysis, setAnalysis] = useState(null)
-  const [compare, setCompare] = useState(null)
-  const [history, setHistory] = useState([])
   const [status, setStatus] = useState(liveStatus || null)
-  const [historyExpanded, setHistoryExpanded] = useState(false)
   const socketRef = useRef(null)
 
   const applySnapshot = useCallback((snap) => {
@@ -41,19 +36,15 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
 
   const loadInit = useCallback(async () => {
     try {
-      const [m, ind, sig, cmp, his, st] = await Promise.all([
+      const [m, ind, sig, st] = await Promise.all([
         api.fetchMarket(),
         api.fetchIndicators(),
         api.fetchSignal(),
-        api.fetchCompare(),
-        api.fetchHistory(),
         api.fetchStatus(),
       ])
       setMarket(m)
       setIndicators(ind)
       setAnalysis(sig)
-      setCompare(cmp)
-      setHistory(his.history || [])
       setStatus(st)
     } catch (e) {}
   }, [])
@@ -74,8 +65,7 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
 
     const poll = setInterval(async () => {
       try {
-        const [sig, cmp] = await Promise.all([api.fetchSignal(), api.fetchCompare()])
-        setCompare(cmp)
+        const sig = await api.fetchSignal()
         setAnalysis((prev) => {
           if (!prev) return sig
           const newTs = sig.ts || sig.generated_at
@@ -116,10 +106,6 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
       </div>
 
       <div className="mt-3">
-        <SignalCompare compare={compare} />
-      </div>
-
-      <div className="mt-3">
         <section className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
           <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted">AI Gold Analyze</div>
           <p className="mb-3 text-xs leading-relaxed text-muted">AI verdict on the current live market.</p>
@@ -155,18 +141,6 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
 
       <div className="mt-3">
         <MarketConditions indicators={indicators} />
-      </div>
-
-      <div className="mt-3">
-        <SignalHistory rows={history} expanded={historyExpanded} />
-        {history.length > 8 ? (
-          <button
-            onClick={() => setHistoryExpanded((v) => !v)}
-            className="mt-1 w-full text-center text-xs font-semibold text-gold underline-offset-2 hover:underline"
-          >
-            {historyExpanded ? 'Show less' : 'Show all history'}
-          </button>
-        ) : null}
       </div>
 
       <footer className="sticky bottom-0 z-10 mt-4 bg-gradient-to-b from-transparent via-bg/95 to-bg pb-3">
