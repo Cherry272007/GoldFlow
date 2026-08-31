@@ -101,8 +101,13 @@ def _mount_dist(app, dist):
     def index():
         return send_from_directory(dist, "index.html")
 
-    @app.errorhandler(404)
-    def spa_fallback(path=None):
+    # Serve a real static file from dist if it exists, otherwise fall back to
+    # index.html so client-side routes work (single-page app).
+    @app.get("/<path:filename>")
+    def spa(filename):
+        candidate = os.path.join(dist, filename)
+        if os.path.isfile(candidate):
+            return send_from_directory(dist, filename)
         return send_from_directory(dist, "index.html")
 
 
