@@ -90,7 +90,7 @@ export default function Dashboard({ market: liveMarket, status: liveStatus, onOp
   }, [loadInit, applySnapshot])
 
   return (
-    <div className="mx-auto min-h-screen max-w-6xl px-4 pb-24">
+    <div className="mx-auto min-h-screen max-w-6xl px-4 pb-44">
       <Header market={market} status={status} />
 
       {authRequired && !import.meta.env.VITE_GOLDFLOW_API_KEY ? (
