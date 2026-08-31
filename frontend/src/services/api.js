@@ -48,6 +48,7 @@ async function post(path, body) {
 export const fetchMarket = () => get('/api/market')
 export const fetchIndicators = () => get('/api/indicators')
 export const fetchSignal = () => get('/api/signal')
+export const fetchCompare = () => get('/api/compare')
 export const fetchAnalysis = () => get('/api/analysis')
 export const fetchHistory = () => get('/api/history')
 export const fetchStatus = () => get('/api/status')
