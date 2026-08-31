@@ -94,40 +94,40 @@ def analyze():
     if denied:
         return denied
 
-    store = current_app.config["GOLDFLOW"]
-    body = request.get_json(silent=True) or {}
-    raw_images = body.get("images") or []
-    force_ai = bool(body.get("force_ai", True))
+    try:
+        store = current_app.config["GOLDFLOW"]
+        body = request.get_json(silent=True) or {}
+        raw_images = body.get("images") or []
+        force_ai = bool(body.get("force_ai", True))
 
-    if not isinstance(raw_images, list):
-        raw_images = [raw_images]
-    if len(raw_images) > config.MAX_IMAGES:
-        return jsonify(
-            {"error": f"Too many screenshots (max {config.MAX_IMAGES})."}
-        ), 400
-
-    images = []
-    for i, item in enumerate(raw_images):
-        if isinstance(item, str):
-            item = {"name": f"screenshot-{i + 1}", "data": item}
-        if not isinstance(item, dict):
-            continue
-        try:
-            images.append(image_analysis.process_screenshot(item.get("data")))
-        except image_analysis.ImageError as exc:
+        if not isinstance(raw_images, list):
+            raw_images = [raw_images]
+        if len(raw_images) > config.MAX_IMAGES:
             return jsonify(
-                {"error": f"{item.get('name', 'screenshot')}: {exc}"}
+                {"error": f"Too many screenshots (max {config.MAX_IMAGES})."}
             ), 400
 
-    try:
+        images = []
+        for i, item in enumerate(raw_images):
+            if isinstance(item, str):
+                item = {"name": f"screenshot-{i + 1}", "data": item}
+            if not isinstance(item, dict):
+                continue
+            try:
+                images.append(image_analysis.process_screenshot(item.get("data")))
+            except image_analysis.ImageError as exc:
+                return jsonify(
+                    {"error": f"{item.get('name', 'screenshot')}: {exc}"}
+                ), 400
+
         result = store.analysis.run_analysis(images=images or None, force_ai=force_ai)
+
+        broadcast_analysis(result)
+        if result.get("ai_error"):
+            result["degraded"] = True
+        result["images_count"] = len(images)
+        return jsonify(result), 200
     except Exception:
         return jsonify(
-            {"error": "AI analysis temporarily unavailable. Please try again."}
+            {"error": "Analysis temporarily unavailable. Please try again in a moment."}
         ), 503
-
-    broadcast_analysis(result)
-    if result.get("ai_error"):
-        result["degraded"] = True
-    result["images_count"] = len(images)
-    return jsonify(result), 200
