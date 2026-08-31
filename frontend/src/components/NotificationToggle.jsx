@@ -7,7 +7,7 @@ import {
   unsubscribeFromPush,
 } from '../services/push'
 
-export default function NotificationToggle() {
+export default function NotificationToggle({ compact = false }) {
   const [enabled, setEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [available, setAvailable] = useState(false)
@@ -55,10 +55,34 @@ export default function NotificationToggle() {
   }, [available, configured, enabled])
 
   if (!available) {
-    return <p className="text-xs text-muted">Alerts require a newer browser.</p>
+    return <p className="text-[10px] text-muted">Alerts need a newer browser.</p>
   }
   if (!configured) {
-    return <p className="text-xs text-muted">Alerts not enabled on this server.</p>
+    return <p className="text-[10px] text-muted">Alerts not enabled.</p>
+  }
+
+  if (compact) {
+    return (
+      <label className="flex cursor-pointer items-center gap-1.5 select-none">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">Alerts</span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={enabled}
+          disabled={loading}
+          onClick={toggle}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+            enabled ? 'bg-ok' : 'bg-line'
+          } ${loading ? 'opacity-60' : ''}`}
+        >
+          <span
+            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+              enabled ? 'translate-x-5' : 'translate-x-0.5'
+            }`}
+          />
+        </button>
+      </label>
+    )
   }
 
   return (

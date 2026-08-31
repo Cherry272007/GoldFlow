@@ -18,8 +18,18 @@ const dot = (status) => {
   return '#c0392b'
 }
 
-export default function Header({ market, status }) {
+export default function Header({ market, status, variant = 'dashboard', onNavigate }) {
   const s = market?.status || status?.market?.status || 'CONNECTING'
+  const tab = (id, label) => (
+    <button
+      onClick={() => onNavigate && onNavigate(id)}
+      className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
+        variant === id ? 'rounded-lg bg-gold/15 text-gold' : 'text-muted hover:text-fg'
+      }`}
+    >
+      {label}
+    </button>
+  )
   return (
     <header className="sticky top-0 z-40 mb-3 -mx-4 flex items-center justify-between border-b border-line/60 bg-bg/80 px-4 py-3 backdrop-blur-md">
       <div className="flex items-center gap-2.5">
@@ -40,15 +50,22 @@ export default function Header({ market, status }) {
           <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted">AI Gold Analyst</div>
         </div>
       </div>
-      <div
-        className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${statusStyle(s)}`}
-      >
-        <span
-          className="h-2 w-2 rounded-full"
-          style={{ backgroundColor: dot(s), boxShadow: `0 0 8px ${dot(s)}` }}
-        />
-        {s}
-        {market?.timestamp ? <span className="opacity-70">· {fmtAge(market.timestamp)}</span> : null}
+
+      <div className="flex items-center gap-2">
+        <nav className="flex items-center rounded-xl border border-line/70 bg-card p-1">
+          {tab('dashboard', 'Dashboard')}
+          {tab('ai', 'AI')}
+        </nav>
+        <div
+          className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${statusStyle(s)}`}
+        >
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: dot(s), boxShadow: `0 0 8px ${dot(s)}` }}
+          />
+          {s}
+          {market?.timestamp ? <span className="opacity-70">· {fmtAge(market.timestamp)}</span> : null}
+        </div>
       </div>
     </header>
   )
