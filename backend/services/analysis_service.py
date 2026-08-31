@@ -25,10 +25,11 @@ from ..signal_engine import SignalEngine
 
 
 class AnalysisService:
-    def __init__(self, market_client, technical_engine, history):
+    def __init__(self, market_client, technical_engine, history, push_service=None):
         self.market = market_client
         self.technical = technical_engine
         self.history = history
+        self.push = push_service
         self.ai = AIManager()
         self._lock = threading.Lock()
         self.latest = None
@@ -52,7 +53,16 @@ class AnalysisService:
         market, indicators = self.snapshot()
         result = self._compute(market, indicators, images, force_ai=force_ai)
         self._store(result)
+        self._notify(result)
         return dict(result)
+
+    def _notify(self, result):
+        """Send a push notification for a fresh BUY/SELL (silent otherwise)."""
+        if self.push is not None:
+            try:
+                self.push.notify_signal(result)
+            except Exception:  # never let notifications break an analysis
+                pass
 
     def analyze_image(self, image):
         market, indicators = self.snapshot()

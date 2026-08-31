@@ -130,3 +130,12 @@ ALLOWED_IMAGE_TYPES = _csv(
 # ---------------------------------------------------------------------------
 DB_PATH = os.environ.get("GOLDFLOW_DB", "goldflow.db")
 HISTORY_LIMIT = _as_int("GOLDFLOW_HISTORY_LIMIT", 500)
+
+# ---------------------------------------------------------------------------
+# Web Push (PWA notifications)
+# ---------------------------------------------------------------------------
+VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "").strip()
+VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
+# "mailto:" contact sent with every push so push services can reach the owner.
+VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "").strip()
+PUSH_STORE_PATH = os.environ.get("GOLDFLOW_PUSH_DB", DB_PATH)

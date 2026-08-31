@@ -1,0 +1,25 @@
+{
+  "name": "GoldFlow — AI Gold Analyst",
+  "short_name": "GoldFlow",
+  "description": "AI gold (XAU/USD) BUY/SELL/WAIT alerts from MT5 + indicators + chart analysis. Alert-only, never trades.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b111c",
+  "theme_color": "#0b111c",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -20,11 +20,14 @@ bp = Blueprint("analysis", __name__)
 @bp.get("/api/config")
 def config_status():
     """Public capability/config info (never includes any secret)."""
+    push = current_app.config["GOLDFLOW"].push
     return jsonify(
         {
             "auth_required": bool(config.GOLDFLOW_API_KEY),
             "max_images": config.MAX_IMAGES,
             "max_image_mb": config.MAX_IMAGE_MB,
+            "push_enabled": push.configured,
+            "vapid_public_key": push.public_key() if push.configured else None,
         }
     )
 

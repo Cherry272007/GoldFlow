@@ -1,5 +1,6 @@
 import React from 'react'
 import { fmtAge } from '../services/format'
+import NotificationToggle from './NotificationToggle'
 
 function Lane({ label, connected, sub, tone }) {
   const color = tone || (connected ? '#21d07a' : '#ff4d5e')
@@ -58,6 +59,9 @@ export default function ConnectionStatus({ status = null }) {
         connected={server.connected}
         sub={`last tick ${fmtAge(market.last_updated)}`}
       />
+      <div className="mt-3 border-t border-line/50 pt-3">
+        <NotificationToggle />
+      </div>
     </section>
   )
 }

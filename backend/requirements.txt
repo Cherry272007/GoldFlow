@@ -6,3 +6,4 @@ lse-data==0.14.0
 python-dotenv==1.0.1
 certifi==2026.5.20
 gunicorn==23.0.0
+pywebpush==2.5.0

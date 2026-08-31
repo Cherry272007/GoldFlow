@@ -25,8 +25,10 @@ from flask import Flask, jsonify, render_template_string, send_from_directory
 from . import config
 from .market_data import MarketDataClient
 from .models.database import SignalHistory
-from .routes import analysis, indicators, market, mt5, signals, status
+from .models.push_store import PushStore
+from .routes import analysis, indicators, market, mt5, push, signals, status
 from .services.analysis_service import AnalysisService
+from .services.push_service import PushService
 from .services.technical import TechnicalEngine
 from .websocket import init_socketio, socketio, start_emitter
 
@@ -48,6 +50,7 @@ def create_app():
     app.register_blueprint(signals.bp)
     app.register_blueprint(analysis.bp)
     app.register_blueprint(status.bp)
+    app.register_blueprint(push.bp)
 
     if os.path.isdir(FRONTEND_DIST):
         _mount_dist(app, FRONTEND_DIST)
@@ -65,15 +68,19 @@ def _build_store():
     market_client = MarketDataClient()
     technical = TechnicalEngine(market_client)
     history = SignalHistory(config.DB_PATH, limit=config.HISTORY_LIMIT)
-    analysis_service = AnalysisService(market_client, technical, history)
-    return _Store(market_client, technical, analysis_service)
+    push_service = PushService(PushStore(config.PUSH_STORE_PATH))
+    analysis_service = AnalysisService(
+        market_client, technical, history, push_service=push_service
+    )
+    return _Store(market_client, technical, analysis_service, push_service)
 
 
 class _Store:
-    def __init__(self, market, technical, analysis):
+    def __init__(self, market, technical, analysis, push):
         self.market = market
         self.technical = technical
         self.analysis = analysis
+        self.push = push
         self.history = analysis.history
 
 
