@@ -26,7 +26,7 @@ from . import config
 from .market_data import MarketDataClient
 from .models.database import SignalHistory
 from .models.push_store import PushStore
-from .routes import analysis, indicators, market, mt5, push, signals, status
+from .routes import analysis, chat, indicators, market, mt5, push, signals, status
 from .services.analysis_service import AnalysisService
 from .services.push_service import PushService
 from .services.technical import TechnicalEngine
@@ -49,6 +49,7 @@ def create_app():
     app.register_blueprint(indicators.bp)
     app.register_blueprint(signals.bp)
     app.register_blueprint(analysis.bp)
+    app.register_blueprint(chat.bp)
     app.register_blueprint(status.bp)
     app.register_blueprint(push.bp)
 

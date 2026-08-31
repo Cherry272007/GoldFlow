@@ -70,6 +70,10 @@ export function analyzeImage(image) {
   })
 }
 
+export function chat(message, history = []) {
+  return post('/api/chat', { message, history })
+}
+
 export function connectSocket() {
   return import('socket.io-client').then(({ io }) =>
     io({ path: '/socket.io', transports: ['websocket', 'polling'], reconnection: true }),
