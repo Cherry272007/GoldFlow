@@ -31,8 +31,14 @@ export default function MarketConditions({ indicators = null }) {
 
   return (
     <section className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Market Conditions</span>
+      <div className="mb-3 flex items-center justify-between">
+        <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="#f5c542" strokeWidth="1.5" />
+            <text x="12" y="16" textAnchor="middle" fontSize="10" fontWeight="700" fill="#f5c542">Au</text>
+          </svg>
+          Gold Analysis
+        </span>
         {i.candle_count ? (
           <span className="rounded-full border border-line bg-card2 px-2 py-0.5 text-[10px] text-muted">{i.candle_count} candles</span>
         ) : null}
