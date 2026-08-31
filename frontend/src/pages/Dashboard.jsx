@@ -105,7 +105,7 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg px-4 pb-44">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-44 lg:px-8">
       <Header market={market} status={status} variant="dashboard" onNavigate={onNavigate} />
 
       <PriceCard market={market} />

@@ -43,7 +43,7 @@ function Card({ title, sub, children }) {
   )
 }
 
-export default function AIPage({ market, status }) {
+export default function AIPage({ market, status, onNavigate }) {
   const [goldAnalysis, setGoldAnalysis] = useState(null)
   const [goldBusy, setGoldBusy] = useState(false)
   const [goldError, setGoldError] = useState(null)
@@ -89,19 +89,19 @@ export default function AIPage({ market, status }) {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg px-4 pb-44">
-      <Header market={market} status={status} variant="ai" />
+    <div className="mx-auto w-full max-w-6xl px-4 pb-44 lg:px-8">
+      <Header market={market} status={status} variant="ai" onNavigate={onNavigate} />
 
-      <Card title="AI Gold Analyze" sub="market + indicators">
-        <p className="mb-2 text-xs leading-relaxed text-muted">AI verdict on the current live market.</p>
-        <AnalyzeButton busy={goldBusy} idleLabel="Analyse current market" onClick={handleGold} />
-        {goldError ? (
-          <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{goldError}</div>
-        ) : null}
-        <div className="mt-3"><AIAnalysis analysis={goldAnalysis} loading={goldBusy} /></div>
-      </Card>
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+        <Card title="AI Gold Analyze" sub="market + indicators">
+          <p className="mb-2 text-xs leading-relaxed text-muted">AI verdict on the current live market.</p>
+          <AnalyzeButton busy={goldBusy} idleLabel="Analyse current market" onClick={handleGold} />
+          {goldError ? (
+            <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{goldError}</div>
+          ) : null}
+          <div className="mt-3"><AIAnalysis analysis={goldAnalysis} loading={goldBusy} /></div>
+        </Card>
 
-      <div className="mt-3">
         <Card title="AI Image Analyze" sub="charts">
           <p className="mb-2 text-xs leading-relaxed text-muted">Upload chart screenshots for the AI to read.</p>
           <ScreenshotUploader onAdd={addImagesFn} disabled={imageBusy} />
