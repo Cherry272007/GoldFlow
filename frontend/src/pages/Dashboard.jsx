@@ -172,9 +172,19 @@ export default function Dashboard() {
             <button
               onClick={handleAnalyze}
               disabled={analyzing}
-              className="w-full rounded-2xl border border-gold/50 bg-gold py-3.5 text-sm font-bold uppercase tracking-wide text-black shadow-lg shadow-gold/20 transition disabled:opacity-50"
+              className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-yellow-500 py-4 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg shadow-gold/20 ring-1 ring-gold/40 transition hover:shadow-gold/40 active:scale-[0.99] disabled:opacity-50 disabled:shadow-none"
             >
-              {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Analyse Now'}
+              {analyzing ? (
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+                  <path d="M12 2 a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2 L13.4 8.6 L20 10 L13.4 11.4 L12 18 L10.6 11.4 L4 10 L10.6 8.6 Z" />
+                </svg>
+              )}
+              {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Run AI Analysis'}
             </button>
 
             {analyzeError ? (

@@ -3,9 +3,9 @@ import React from 'react'
 function Chip({ label, value, tone }) {
   if (value == null || value === '') return null
   return (
-    <div className="rounded-lg border border-line bg-card2 px-3 py-2">
-      <div className="text-[10px] uppercase tracking-wider text-muted">{label}</div>
-      <div className={`text-sm font-semibold ${tone || ''}`}>{String(value).toUpperCase()}</div>
+    <div className="rounded-lg border border-line/70 bg-card2/70 px-2.5 py-2 text-center">
+      <div className="text-[9px] uppercase tracking-wider text-muted">{label}</div>
+      <div className={`mt-0.5 text-sm font-bold ${tone || 'text-fg'}`}>{String(value).toUpperCase()}</div>
     </div>
   )
 }

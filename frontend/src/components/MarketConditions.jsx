@@ -2,9 +2,15 @@ import React from 'react'
 
 function Row({ label, value, tone }) {
   return (
-    <div className="flex items-center justify-between border-b border-line/50 py-1.5 last:border-0">
+    <div className="flex items-center justify-between py-1.5">
       <span className="text-xs text-muted">{label}</span>
-      <span className={`text-sm font-semibold tabular-nums ${tone || ''}`}>{value}</span>
+      <span
+        className={`rounded-md px-2 py-0.5 text-xs font-semibold tabular-nums ${
+          tone ? `${tone} bg-white/5` : 'bg-card2 text-fg'
+        }`}
+      >
+        {value}
+      </span>
     </div>
   )
 }
@@ -24,8 +30,13 @@ export default function MarketConditions({ indicators = null }) {
   const macdTone = macd == null ? '' : i.macd_histogram > 0 ? 'text-ok' : i.macd_histogram < 0 ? 'text-bad' : 'text-wait'
 
   return (
-    <section className="rounded-2xl border border-line bg-card p-4">
-      <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Market Conditions</div>
+    <section className="rounded-2xl border border-line bg-gradient-to-b from-card to-card2 p-4">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Market Conditions</span>
+        {i.candle_count ? (
+          <span className="rounded-full border border-line bg-card2 px-2 py-0.5 text-[10px] text-muted">{i.candle_count} candles</span>
+        ) : null}
+      </div>
 
       <Row label="H1 Trend" value={(i.trend || '—').toUpperCase()} tone={tone(i.trend)} />
       <Row label="EMA 20" value={i.ema20 == null ? '—' : Number(i.ema20).toFixed(2)} />
@@ -34,7 +45,6 @@ export default function MarketConditions({ indicators = null }) {
       <Row label="MACD Hist" value={macd ?? '—'} tone={macdTone} />
       <Row label="Support" value={i.support == null ? '—' : Number(i.support).toFixed(2)} />
       <Row label="Resistance" value={i.resistance == null ? '—' : Number(i.resistance).toFixed(2)} />
-      <Row label="Candles" value={i.candle_count ?? (i.candles || '—')} />
       {i.volume != null && i.volume > 0 ? <Row label="Volume" value={Number(i.volume).toLocaleString()} /> : null}
     </section>
   )
