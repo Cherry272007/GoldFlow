@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState(null)
   const [historyExpanded, setHistoryExpanded] = useState(false)
+  const [view, setView] = useState('main') // 'main' | 'analysis' (mobile page)
 
   const runningRef = useRef(false)
   const imagesRef = useRef(images)
@@ -136,54 +137,71 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col gap-3 pb-8">
+    <div className="mx-auto min-h-screen max-w-6xl px-4 pb-8">
       <Header market={market} status={status} />
 
       {authRequired && !import.meta.env.VITE_GOLDFLOW_API_KEY ? (
-        <div className="rounded-2xl border border-wait/30 bg-wait/10 p-3 text-xs text-wait">
+        <div className="mb-3 rounded-2xl border border-wait/30 bg-wait/10 p-3 text-xs text-wait">
           This dashboard requires a GoldFlow API key. Set <code>VITE_GOLDFLOW_API_KEY</code> at build time to enable analysis.
         </div>
       ) : null}
 
-      <PriceCard market={market} />
+      {view === 'analysis' ? (
+        <div className="mb-3">
+          <button
+            onClick={() => setView('main')}
+            className="mb-3 text-xs font-semibold text-gold underline-offset-2 hover:underline"
+          >
+            ← Back to dashboard
+          </button>
+          <AIAnalysis analysis={analysis} loading={analyzing} />
+          {analysis ? <div className="mt-3"><ScreenshotAnalysis images={images} analysis={analysis} /></div> : null}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+          <div className="space-y-3 lg:col-span-2">
+            <PriceCard market={market} />
+            <SignalCard analysis={analysis} loading={analyzing} />
+            <MarketConditions indicators={indicators} />
 
-      <div className="grid grid-cols-1 gap-3">
-        <SignalCard analysis={analysis} loading={analyzing} />
-      </div>
+            <div className="space-y-2">
+              <ScreenshotUploader onAdd={addImages} disabled={analyzing} />
+              <ScreenshotPreview images={images} onRemove={removeImage} />
+            </div>
 
-      <MarketConditions indicators={indicators} />
+            <button
+              onClick={handleAnalyze}
+              disabled={analyzing}
+              className="w-full rounded-2xl border border-gold/50 bg-gold py-3.5 text-sm font-bold uppercase tracking-wide text-black shadow-lg shadow-gold/20 transition disabled:opacity-50"
+            >
+              {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Analyse Now'}
+            </button>
 
-      <div className="space-y-2">
-        <ScreenshotUploader onAdd={addImages} disabled={analyzing} />
-        <ScreenshotPreview images={images} onRemove={removeImage} />
-      </div>
+            {analyzeError ? (
+              <div className="rounded-xl border border-bad/30 bg-bad/10 p-3 text-xs text-bad">{analyzeError}</div>
+            ) : null}
+          </div>
 
-      <button
-        onClick={handleAnalyze}
-        disabled={analyzing}
-        className="w-full rounded-2xl border border-gold/50 bg-gold py-3.5 text-sm font-bold uppercase tracking-wide text-black shadow-lg shadow-gold/20 transition disabled:opacity-50"
-      >
-        {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Analyse Now'}
-      </button>
-
-      {analyzeError ? (
-        <div className="rounded-xl border border-bad/30 bg-bad/10 p-3 text-xs text-bad">{analyzeError}</div>
-      ) : null}
-
-      {analysis && (
-        <>
-          <AIAnalysis analysis={analysis} />
-          <ScreenshotAnalysis images={images} analysis={analysis} />
-        </>
+          <div className="space-y-3">
+            <AIAnalysis analysis={analysis} loading={analyzing} />
+            {analysis ? <ScreenshotAnalysis images={images} analysis={analysis} /> : null}
+            <ConnectionStatus status={status} />
+          </div>
+        </div>
       )}
 
-      <ConnectionStatus status={status} />
+      <button
+        onClick={() => setView('analysis')}
+        className="fixed bottom-4 right-4 z-50 rounded-full border border-gold/50 bg-gold px-5 py-3 text-sm font-bold uppercase tracking-wide text-black shadow-lg shadow-gold/20 lg:hidden"
+      >
+        AI Analyze
+      </button>
 
       <SignalHistory rows={history} expanded={historyExpanded} />
       {history.length > 8 ? (
         <button
           onClick={() => setHistoryExpanded((v) => !v)}
-          className="text-center text-xs font-semibold text-gold underline-offset-2 hover:underline"
+          className="mt-1 text-center text-xs font-semibold text-gold underline-offset-2 hover:underline"
         >
           {historyExpanded ? 'Show less' : 'Show all history'}
         </button>

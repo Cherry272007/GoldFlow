@@ -10,8 +10,20 @@ function Chip({ label, value, tone }) {
   )
 }
 
-export default function AIAnalysis({ analysis = null }) {
-  if (!analysis) return null
+export default function AIAnalysis({ analysis = null, loading = false }) {
+  if (!analysis) {
+    return (
+      <section className="rounded-2xl border border-line bg-card p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Gold Analysis</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted">openrouter</span>
+        </div>
+        <div className="grid place-items-center rounded-xl border border-dashed border-line bg-card2 py-10 text-center text-xs text-muted">
+          {loading ? 'Analysing market…' : 'Run an analysis to see the AI signal here.'}
+        </div>
+      </section>
+    )
+  }
 
   const trendTone =
     analysis.trend === 'BULLISH'

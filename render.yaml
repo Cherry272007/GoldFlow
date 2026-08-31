@@ -8,6 +8,11 @@ services:
     envVars:
       - key: GOLDFLOW_API_KEY
         sync: false
+      # VITE_GOLDFLOW_API_KEY is consumed by the frontend build and baked into
+      # the JS bundle. Set it to the SAME value as GOLDFLOW_API_KEY so the
+      # dashboard can call the protected /api/analyze endpoint.
+      - key: VITE_GOLDFLOW_API_KEY
+        sync: false
       - key: GOLDFLOW_DB
         value: /tmp/goldflow.db
       - key: OPENROUTER_MODEL
@@ -15,4 +20,4 @@ services:
       - key: MT5_SYMBOL
         value: XAUUSD
     # Set these as SECRETS in the Render dashboard (never commit their values):
-    #   LSE_API_KEY, OPENROUTER_API_KEY, GOLDFLOW_API_KEY
+    #   LSE_API_KEY, OPENROUTER_API_KEY, GOLDFLOW_API_KEY (= VITE_GOLDFLOW_API_KEY)
