@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import PriceCard from '../components/PriceCard'
 import SignalCard from '../components/SignalCard'
+import SourcesCard from '../components/SourcesCard'
 import MarketConditions from '../components/MarketConditions'
 import ScreenshotUploader from '../components/ScreenshotUploader'
 import ScreenshotPreview from '../components/ScreenshotPreview'
@@ -160,6 +161,7 @@ export default function Dashboard() {
         {/* ── Left column: price + signal + connection ── */}
         <div className="space-y-3 lg:col-span-2">
           <PriceCard market={market} />
+          <SourcesCard market={market} />
           <SignalCard analysis={analysis} loading={analyzing} />
           <ConnectionStatus status={status} />
 

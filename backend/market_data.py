@@ -66,6 +66,14 @@ class MarketDataClient:
         self._last_tick_at = None   # monotonic time of last live tick
         self._stream_up = False     # False while the upstream (LSE) is down
 
+        # Per-source quotes so the dashboard can show MT5 and LSE live values
+        # independently. MT5 is the primary feed; LSE is secondary + candles.
+        self._mt5_quote = self._empty_source_quote("mt5")
+        self._lse_quote = self._empty_source_quote("lse")
+        self._mt5_last_at = None    # monotonic time of last MT5 tick
+        self._lse_last_at = None    # monotonic time of last LSE tick
+        self._lse_stream_up = False
+
         # For simulated fallback nearly everywhere (candles, dev feed).
         self._sim_price = config.SIMULATED_BASE_PRICE
         self._seed_candles()
@@ -99,7 +107,13 @@ class MarketDataClient:
     # ------------------------------------------------------------------
     def quote(self):
         with self._lock:
-            return dict(self._quote)
+            data = dict(self._quote)
+            data["sources"] = {
+                "mt5": self._source_quote_locked("mt5"),
+                "lse": self._source_quote_locked("lse"),
+                "active": self._active_source_locked(),
+            }
+            return data
 
     def candles(self):
         with self._lock:
@@ -118,7 +132,48 @@ class MarketDataClient:
             "live": data.get("status") == "LIVE",
             "symbol": self.symbol,
             "status": data.get("status"),
+            "sources": data.get("sources"),
         }
+
+    def _empty_source_quote(self, source):
+        return {
+            "key": source,
+            "name": "MetaTrader 5 (GoldFlowEA)"
+            if source == "mt5"
+            else "London Strategic Edge",
+            "short": "MT5" if source == "mt5" else "LSE",
+            "role": "Primary live feed" if source == "mt5" else "Secondary + candles",
+            "price": None,
+            "bid": None,
+            "ask": None,
+            "spread": None,
+            "status": "CONNECTING",
+            "timestamp": None,
+        }
+
+    def _source_quote_locked(self, source):
+        base = dict(self._mt5_quote if source == "mt5" else self._lse_quote)
+        last_at = self._mt5_last_at if source == "mt5" else self._lse_last_at
+        base["status"] = self._source_status_locked(source, last_at)
+        return base
+
+    def _source_status_locked(self, source, last_at):
+        if self.mode == "simulated":
+            return "LIVE" if source == "mt5" else "DOWN"
+        if last_at is None:
+            return "CONNECTING"
+        age = time.monotonic() - last_at
+        if age <= self.stale_after:
+            return "LIVE"
+        return "STALE"
+
+    def _active_source_locked(self):
+        # Which source is currently feeding the blended quote.
+        if self.mode == "simulated":
+            return "simulated"
+        if self._mt5_last_at is not None:
+            return "mt5"
+        return "lse"
 
     # ------------------------------------------------------------------
     # MT5 HTTP ingest (called from POST /api/mt5)
@@ -176,6 +231,19 @@ class MarketDataClient:
             self._last_tick_at = time.monotonic()
             self._quote = record
             self._stream_up = True
+
+            # Track the MT5 source quote independently.
+            self._mt5_last_at = time.monotonic()
+            self._mt5_quote.update(
+                {
+                    "price": round(price, 5),
+                    "bid": bid,
+                    "ask": ask,
+                    "spread": spread,
+                    "status": "LIVE",
+                    "timestamp": ts,
+                }
+            )
         return True
 
     # ------------------------------------------------------------------
@@ -203,9 +271,6 @@ class MarketDataClient:
             backoff = min(backoff * 2, 60.0)
 
     def _handle_lse_tick(self, tick):
-        # LSE is a fallback only when MT5 has not supplied a fresher tick.
-        if self._mt5_is_fresh():
-            return
         price = _fmt(getattr(tick, "price", None))
         if price is None:
             return
@@ -228,7 +293,25 @@ class MarketDataClient:
             change = round(price - previous, 4)
             change_pct = round(change / previous * 100, 3) if previous else None
 
+        # Always record LSE's own latest quote so it can be shown independently.
         with self._lock:
+            self._lse_last_at = time.monotonic()
+            self._lse_quote.update(
+                {
+                    "price": price,
+                    "bid": bid or round(price - 0.15, 2),
+                    "ask": ask or round(price + 0.15, 2),
+                    "spread": _fmt(ask - bid, 4)
+                    if bid is not None and ask is not None
+                    else None,
+                    "status": "LIVE",
+                    "timestamp": ts,
+                }
+            )
+
+            # LSE is a fallback only when MT5 has not supplied a fresher tick.
+            if self._mt5_is_fresh_locked():
+                return
             self._last_tick_at = time.monotonic()
             self._quote = {
                 "symbol": self.symbol,
@@ -249,9 +332,16 @@ class MarketDataClient:
         if self.mode not in ("mt5", "auto", "lse"):
             return False
         with self._lock:
-            if self._last_tick_at is None:
+            if self._mt5_last_at is None:
                 return False
-            return time.monotonic() - self._last_tick_at <= self.stale_after / 2
+            return time.monotonic() - self._mt5_last_at <= self.stale_after / 2
+
+    def _mt5_is_fresh_locked(self):
+        if self.mode not in ("mt5", "auto", "lse"):
+            return False
+        if self._mt5_last_at is None:
+            return False
+        return time.monotonic() - self._mt5_last_at <= self.stale_after / 2
 
     # ------------------------------------------------------------------
     # 1-minute candles (LSE REST, or simulated)
