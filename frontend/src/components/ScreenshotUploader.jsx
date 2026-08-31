@@ -52,7 +52,7 @@ export default function ScreenshotUploader({ onAdd, disabled = false }) {
             />
           </svg>
         </div>
-        <div className="text-sm font-semibold">Upload MT5 / Bookmap screenshots</div>
+        <div className="text-sm font-semibold">Upload chart screenshots</div>
         <div className="text-[11px] text-muted">Tap to add a photo of your chart · images are analysed privately</div>
       </div>
       <input

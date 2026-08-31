@@ -21,10 +21,10 @@ const dot = (status) => {
 export default function Header({ market, status }) {
   const s = market?.status || status?.market?.status || 'CONNECTING'
   return (
-    <header className="flex items-center justify-between px-4 pt-4 pb-2">
-      <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 place-items-center rounded-xl bg-gold/15 border border-gold/30">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <header className="sticky top-0 z-40 mb-3 -mx-4 flex items-center justify-between border-b border-line/60 bg-bg/80 px-4 py-3 backdrop-blur-md">
+      <div className="flex items-center gap-2.5">
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-gold/25 to-gold/5 border border-gold/40 shadow-lg shadow-gold/10">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"
               stroke="#f5c542"
@@ -36,8 +36,8 @@ export default function Header({ market, status }) {
           </svg>
         </div>
         <div>
-          <div className="text-lg font-bold leading-none tracking-wide">GOLDFLOW</div>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-muted">AI Gold Analyst</div>
+          <div className="text-lg font-extrabold leading-none tracking-wider">GOLDFLOW</div>
+          <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted">AI Gold Analyst</div>
         </div>
       </div>
       <div

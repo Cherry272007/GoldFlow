@@ -190,12 +190,17 @@ export default function Dashboard() {
         </div>
       )}
 
-      <button
-        onClick={() => setView('analysis')}
-        className="fixed bottom-4 right-4 z-50 rounded-full border border-gold/50 bg-gold px-5 py-3 text-sm font-bold uppercase tracking-wide text-black shadow-lg shadow-gold/20 lg:hidden"
-      >
-        AI Analyze
-      </button>
+      {view !== 'analysis' ? (
+        <button
+          onClick={() => setView('analysis')}
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-yellow-500 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wider text-black shadow-xl shadow-gold/30 ring-1 ring-gold/60 transition active:scale-95 lg:hidden"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2 L13.4 8.6 L20 10 L13.4 11.4 L12 18 L10.6 11.4 L4 10 L10.6 8.6 Z" fill="currentColor" />
+          </svg>
+          AI Analyze
+        </button>
+      ) : null}
 
       <SignalHistory rows={history} expanded={historyExpanded} />
       {history.length > 8 ? (
