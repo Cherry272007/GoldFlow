@@ -36,8 +36,11 @@ int OnInit()
 {
    if(StringLen(InpAPIKey) < 5 || StringFind(InpAPIKey, "GF_") != 0)
    {
-      Print("GoldFlow: invalid API key. Use a key starting with GF_.");
-      return(INIT_PARAMETERS_INCORRECT);
+      if(StringLen(InpAPIKey) < 5)
+      {
+         Print("GoldFlow: invalid API key. Set InpAPIKey to your GoldFlow key.");
+         return(INIT_PARAMETERS_INCORRECT);
+      }
    }
    g_handle_fast = iMA(_Symbol, PERIOD_H1, InpEMA_Fast, 0, MODE_EMA, PRICE_CLOSE);
    g_handle_slow = iMA(_Symbol, PERIOD_H1, InpEMA_Slow, 0, MODE_EMA, PRICE_CLOSE);

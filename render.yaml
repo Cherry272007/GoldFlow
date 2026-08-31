@@ -4,9 +4,15 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r backend/requirements.txt && cd frontend && npm install && npm run build
-    startCommand: gunicorn backend.app:app
+    startCommand: gunicorn backend.app:app --workers 1 --threads 1
     envVars:
       - key: GOLDFLOW_API_KEY
-        generateValue: true
+        sync: false
       - key: GOLDFLOW_DB
         value: /tmp/goldflow.db
+      - key: OPENROUTER_MODEL
+        value: minimax/minimax-m3:free
+      - key: MT5_SYMBOL
+        value: XAUUSD
+    # Set these as SECRETS in the Render dashboard (never commit their values):
+    #   LSE_API_KEY, OPENROUTER_API_KEY, GOLDFLOW_API_KEY

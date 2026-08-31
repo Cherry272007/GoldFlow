@@ -1,2 +1,8 @@
 Flask==3.0.3
-gunicorn==22.0.0
+Flask-SocketIO==5.6.1
+requests==2.32.4
+Pillow==11.1.0
+lse-data==0.14.0
+python-dotenv==1.0.1
+certifi==2026.5.20
+gunicorn==23.0.0

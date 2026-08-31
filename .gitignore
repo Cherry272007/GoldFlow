@@ -17,6 +17,12 @@ npm-debug.log*
 
 # Java
 bookmap/*.class
+bookmap/lib/
+bookmap/build/
+bookmap/dist/
+
+# Compiled EA contains the live API key - never commit it
+mt5/GoldFlowEA.ex5
 
 # macOS
 .DS_Store

@@ -1,50 +1,197 @@
-import { useEffect, useState } from 'react'
-import { fetchHistory, fetchSignal, fetchStatus } from '../services/api'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import Header from '../components/Header'
+import PriceCard from '../components/PriceCard'
 import SignalCard from '../components/SignalCard'
-import ConnectionCard from '../components/ConnectionCard'
-import MarketCard from '../components/MarketCard'
-import HistoryCard from '../components/HistoryCard'
+import MarketConditions from '../components/MarketConditions'
+import ScreenshotUploader from '../components/ScreenshotUploader'
+import ScreenshotPreview from '../components/ScreenshotPreview'
+import ScreenshotAnalysis from '../components/ScreenshotAnalysis'
+import AIAnalysis from '../components/AIAnalysis'
+import SignalHistory from '../components/SignalHistory'
+import ConnectionStatus from '../components/ConnectionStatus'
+import * as api from '../services/api'
 
 export default function Dashboard() {
-  const [signal, setSignal] = useState(null)
-  const [status, setStatus] = useState(null)
+  const [market, setMarket] = useState(null)
+  const [indicators, setIndicators] = useState(null)
+  const [analysis, setAnalysis] = useState(null)
   const [history, setHistory] = useState([])
-  const [online, setOnline] = useState(true)
+  const [status, setStatus] = useState(null)
+  const [authRequired, setAuthRequired] = useState(false)
+  const [images, setImages] = useState([])
 
-  useEffect(() => {
-    const loadAll = async () => {
-      try {
-        const [s, st, h] = await Promise.all([
-          fetchSignal(),
-          fetchStatus(),
-          fetchHistory(),
-        ])
-        setSignal(s)
-        setStatus(st)
-        setHistory(h.history || [])
-        setOnline(true)
-      } catch {
-        setOnline(false)
-      }
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState(null)
+  const [historyExpanded, setHistoryExpanded] = useState(false)
+
+  const runningRef = useRef(false)
+  const imagesRef = useRef(images)
+  imagesRef.current = images
+
+  const applySnapshot = useCallback((snap) => {
+    if (snap.market) setMarket(snap.market)
+    if (snap.indicators) setIndicators(snap.indicators)
+    if (snap.signal) {
+      setAnalysis((prev) => {
+        if (!prev) return snap.signal
+        const newTs = snap.signal.ts || snap.signal.generated_at
+        const prevTs = prev.ts || prev.generated_at
+        if (!newTs || !prevTs) return snap.signal
+        return newTs !== prevTs ? snap.signal : prev
+      })
     }
-    loadAll()
-    const fast = setInterval(loadAll, 1000)
-    return () => clearInterval(fast)
   }, [])
 
+  const loadInit = useCallback(async () => {
+    try {
+      const [m, ind, sig, his, st, cfg] = await Promise.all([
+        api.fetchMarket(),
+        api.fetchIndicators(),
+        api.fetchSignal(),
+        api.fetchHistory(),
+        api.fetchStatus(),
+        api.fetchConfig(),
+      ])
+      setMarket(m)
+      setIndicators(ind)
+      setAnalysis(sig)
+      setHistory(his.history || [])
+      setStatus(st)
+      setAuthRequired(cfg.auth_required)
+    } catch (e) {
+      // Socket may still bring live data; do not block the dashboard.
+    }
+  }, [])
+
+  useEffect(() => {
+    let socket = null
+    let cancelled = false
+    loadInit()
+    api
+      .connectSocket()
+      .then((sock) => {
+        if (cancelled) {
+          sock.close()
+          return
+        }
+        socket = sock
+        const onMarket = (d) => applySnapshot(d)
+        const onAnalysis = (d) => {
+          if (d.analysis) setAnalysis(d.analysis)
+        }
+        sock.on('market_update', onMarket)
+        sock.on('analysis_update', onAnalysis)
+        sock.emit('refresh')
+      })
+      .catch(() => {
+        /* polling fallback below */
+      })
+
+    const poll = setInterval(async () => {
+      try {
+        const sig = await api.fetchSignal()
+        setAnalysis((prev) => {
+          if (!prev) return sig
+          const newTs = sig.ts || sig.generated_at
+          const prevTs = prev.ts || prev.generated_at
+          if (!newTs || !prevTs) return sig
+          return newTs !== prevTs ? sig : prev
+        })
+      } catch {
+        /* ignore transient */
+      }
+    }, 6000)
+
+    return () => {
+      cancelled = true
+      if (socket) socket.close()
+      clearInterval(poll)
+    }
+  }, [loadInit, applySnapshot])
+
+  const addImages = useCallback((imgs) => setImages((prev) => [...prev, ...imgs]), [])
+  const removeImage = useCallback((id) => setImages((prev) => prev.filter((i) => i.id !== id)), [])
+
+  const handleAnalyze = async () => {
+    if (runningRef.current) return
+    runningRef.current = true
+    setAnalyzing(true)
+    setAnalyzeError(null)
+    try {
+      const res = await api.runAnalysis(imagesRef.current)
+      setAnalysis(res)
+      setImages([])
+      try {
+        const his = await api.fetchHistory()
+        setHistory(his.history || [])
+      } catch {
+        /* history refresh best-effort */
+      }
+    } catch (e) {
+      setAnalyzeError(e.message || 'Analysis failed')
+    } finally {
+      runningRef.current = false
+      setAnalyzing(false)
+    }
+  }
+
   return (
-    <div className="wrap">
-      <div className="app-title">GOLDFLOW</div>
-      {!online && (
-        <div className="card badge">
-          <span className="wait">&#9679; Server unreachable</span>
+    <div className="mx-auto flex min-h-screen max-w-md flex-col gap-3 pb-8">
+      <Header market={market} status={status} />
+
+      {authRequired && !import.meta.env.VITE_GOLDFLOW_API_KEY ? (
+        <div className="rounded-2xl border border-wait/30 bg-wait/10 p-3 text-xs text-wait">
+          This dashboard requires a GoldFlow API key. Set <code>VITE_GOLDFLOW_API_KEY</code> at build time to enable analysis.
         </div>
+      ) : null}
+
+      <PriceCard market={market} />
+
+      <div className="grid grid-cols-1 gap-3">
+        <SignalCard analysis={analysis} loading={analyzing} />
+      </div>
+
+      <MarketConditions indicators={indicators} />
+
+      <div className="space-y-2">
+        <ScreenshotUploader onAdd={addImages} disabled={analyzing} />
+        <ScreenshotPreview images={images} onRemove={removeImage} />
+      </div>
+
+      <button
+        onClick={handleAnalyze}
+        disabled={analyzing}
+        className="w-full rounded-2xl border border-gold/50 bg-gold py-3.5 text-sm font-bold uppercase tracking-wide text-black shadow-lg shadow-gold/20 transition disabled:opacity-50"
+      >
+        {analyzing ? 'Analysing…' : images.length ? `Analyse ${images.length} screenshot${images.length > 1 ? 's' : ''}` : 'Analyse Now'}
+      </button>
+
+      {analyzeError ? (
+        <div className="rounded-xl border border-bad/30 bg-bad/10 p-3 text-xs text-bad">{analyzeError}</div>
+      ) : null}
+
+      {analysis && (
+        <>
+          <AIAnalysis analysis={analysis} />
+          <ScreenshotAnalysis images={images} analysis={analysis} />
+        </>
       )}
-      <SignalCard signal={signal} />
-      <ConnectionCard status={status} />
-      <MarketCard signal={signal} status={status} />
-      <HistoryCard history={history} />
-      <div className="footer">Alert-only. GoldFlow does not place orders.</div>
+
+      <ConnectionStatus status={status} />
+
+      <SignalHistory rows={history} expanded={historyExpanded} />
+      {history.length > 8 ? (
+        <button
+          onClick={() => setHistoryExpanded((v) => !v)}
+          className="text-center text-xs font-semibold text-gold underline-offset-2 hover:underline"
+        >
+          {historyExpanded ? 'Show less' : 'Show all history'}
+        </button>
+      ) : null}
+
+      <footer className="pt-2 text-center text-[10px] text-muted/70">
+        GoldFlow — alert-only gold analysis. Not financial advice. Market data via London Strategic Edge.
+      </footer>
     </div>
   )
 }

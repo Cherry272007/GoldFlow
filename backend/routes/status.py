@@ -1,30 +1,28 @@
-"""Status endpoint: GET /api/status."""
+"""Connection status endpoint: GET /api/status.
+
+Surfaces market source health (LSE webSocket), AI provider status, and server
+health for the ConnectionStatus component.
+"""
 
 from flask import Blueprint, current_app, jsonify
-
-from ..services.signal_engine import seconds_since
 
 bp = Blueprint("status", __name__)
 
 
-@bp.route("/api/status")
+@bp.get("/api/status")
 def status():
-    store = current_app.config["GOLDFLOW_STORE"]
-    with store._lock:
-        mt5 = dict(store.mt5)
-        bookmap = dict(store.bookmap)
-
-    def source(state):
-        return {
-            "connected": state.get("connected", False),
-            "last_seen": state.get("last_seen"),
-            "age_seconds": round(seconds_since(state.get("last_seen")) or 0, 1),
-        }
-
+    store = current_app.config["GOLDFLOW"]
+    market = store.market.quote()
     return jsonify(
         {
-            "mt5": source(mt5),
-            "bookmap": source(bookmap),
-            "server": {"connected": True, "time": store.result.get("updated_at")},
+            "market": {
+                "connected": market.get("status") == "LIVE",
+                "status": market.get("status", "CONNECTING"),
+                "source": store.market.source_info(),
+                "last_updated": market.get("timestamp"),
+                "price": market.get("price"),
+            },
+            "ai": store.analysis.status().get("ai"),
+            "server": {"connected": True, "time": market.get("timestamp")},
         }
     )

@@ -1,4 +1,16 @@
-"""MT5 ingest endpoint: POST /api/mt5."""
+"""MT5 (GoldFlowEA) ingest endpoint.
+
+POST /api/mt5  - receive a live tick payload from the customer's MetaTrader 5
+                 GoldFlowEA and apply it as the primary market quote.
+
+The EA only sends data; it never trades. Payload fields (all optional except
+price or bid/ask): symbol, price, bid, ask, spread, timestamp, volume,
+h1_trend, m15_structure.
+
+Auth follows the same rule as the other write endpoints: when GOLDFLOW_API_KEY
+is configured the request must carry it as ``Authorization: Bearer`` or
+``X-GoldFlow-Key``.
+"""
 
 from flask import Blueprint, current_app, jsonify, request
 
@@ -7,61 +19,36 @@ from ..auth import authorize
 bp = Blueprint("mt5", __name__)
 
 
-def validate(payload, config):
-    errors = []
-    symbol = str(payload.get("symbol", config.DEFAULT_SYMBOL)).upper()
-    if symbol and symbol not in config.ALLOWED_MT5_SYMBOLS:
-        errors.append("unsupported symbol %s" % symbol)
-    if "bid" in payload and not _is_number(payload["bid"]):
-        errors.append("bid must be a number")
-    if "ask" in payload and not _is_number(payload["ask"]):
-        errors.append("ask must be a number")
-    if "timestamp" in payload and not _is_number(payload["timestamp"]):
-        errors.append("timestamp must be a number")
-    return errors, symbol
-
-
-@bp.route("/api/mt5", methods=["POST"])
-def submit():
+@bp.post("/api/mt5")
+def ingest():
     if not authorize(request):
         return jsonify({"error": "unauthorized"}), 401
 
-    config = current_app.config["GOLDFLOW"]
-    payload = request.get_json(silent=True) or {}
-    errors, symbol = validate(payload, config)
-    if errors:
-        return jsonify({"error": "invalid payload", "details": errors}), 400
+    body = request.get_json(silent=True) or {}
+    if not isinstance(body, dict):
+        return jsonify({"error": "expected a JSON object"}), 400
 
-    state = {
-        "symbol": symbol,
-        "bid": _number(payload.get("bid")),
-        "ask": _number(payload.get("ask")),
-        "spread": _number(payload.get("spread", _spread(payload))),
-        "h1_trend": str(payload.get("h1_trend", "NEUTRAL")).upper(),
-        "m15_structure": str(payload.get("m15_structure", "NEUTRAL")).upper(),
-        "timestamp": _number(payload.get("timestamp")),
-    }
+    symbol = body.get("symbol") or body.get("instrument")
+    price = body.get("price")
+    bid = body.get("bid")
+    ask = body.get("ask")
 
-    store = current_app.config["GOLDFLOW_STORE"]
-    store.update_mt5(state)
-    return jsonify({"ok": True, "result": store.result})
+    if price is None and bid is None and ask is None:
+        return jsonify(
+            {"error": "Provide price, or bid and ask."}
+        ), 400
 
+    store = current_app.config["GOLDFLOW"]
+    payload = dict(body)
+    if symbol:
+        payload["symbol"] = symbol
 
-def _spread(payload):
-    try:
-        bid = float(payload["bid"])
-        ask = float(payload["ask"])
-        return ask - bid
-    except (KeyError, TypeError, ValueError):
-        return None
+    ok = store.market.ingest_mt5(payload)
+    if not ok:
+        return jsonify({"error": "Could not apply the MT5 payload"}), 400
 
+    from ..websocket import broadcast_market
 
-def _is_number(value):
-    return isinstance(value, (int, float))
-
-
-def _number(value):
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
+    market = store.market.quote()
+    broadcast_market(market, store.technical.latest(), store.analysis.current_signal())
+    return jsonify({"ok": True, "quote": market}), 200
