@@ -7,6 +7,7 @@ import SourcesCard from '../components/SourcesCard'
 import MarketConditions from '../components/MarketConditions'
 import SignalHistory from '../components/SignalHistory'
 import AIAnalysis from '../components/AIAnalysis'
+import AISignalResult from '../components/AISignalResult'
 import ConnectionStatus from '../components/ConnectionStatus'
 import * as api from '../services/api'
 
@@ -138,7 +139,17 @@ export default function Dashboard({ status: liveStatus, onNavigate }) {
           {goldError ? (
             <div className="mt-2 rounded-xl border border-bad/30 bg-bad/10 p-2.5 text-xs text-bad">{goldError}</div>
           ) : null}
-          <div className="mt-3"><AIAnalysis analysis={goldAnalysis} loading={goldBusy} /></div>
+
+          <div className="mt-3">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gold">
+              AI Gold Analyze · Result
+            </div>
+            <AISignalResult analysis={goldAnalysis} loading={goldBusy} />
+          </div>
+
+          {goldAnalysis ? (
+            <div className="mt-3"><AIAnalysis analysis={goldAnalysis} loading={goldBusy} /></div>
+          ) : null}
         </section>
       </div>
 
